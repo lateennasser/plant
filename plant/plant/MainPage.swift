@@ -15,4 +15,6 @@ struct MainPage: View {
 
 #Preview {
     MainPage()
+        .preferredColorScheme(.dark)
 }
+
