@@ -1,16 +1,14 @@
-//
-//  OnboardingView.swift
-//  plant
-//
-//  Created by Lateen Nasser on 29/05/1448 AH.
-//
-
 import SwiftUI
 
 struct OnboardingView: View {
+    @Binding var showOnboarding: Bool
+    @Binding var showReminder: Bool
+
     var body: some View {
         VStack(spacing: 37) {
             Image("Happy")
+                .resizable()
+                .scaledToFit()
                 .frame(width: 200, height: 200)
 
             VStack(spacing: 25) {
@@ -23,23 +21,25 @@ struct OnboardingView: View {
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 45)
-                
             }
+
             Button {
-              
+                showOnboarding = false
+                showReminder = true
             } label: {
                 Text("Set Plant Reminder")
-                    .font(.system(size: 17, weight: .semibold))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(.white)
                     .frame(width: 280, height: 44)
-                    .glassEffect(.regular.tint(.gp).interactive(), in: .capsule)
+                    .glassEffect(.regular.tint(.gp.opacity(0.45)), in: .capsule)
             }
         }
-        
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .contentShape(Rectangle())
     }
 }
 
 #Preview {
-    OnboardingView()
-            .preferredColorScheme(.dark)
+    OnboardingView(showOnboarding: .constant(true), showReminder: .constant(false))
+        .preferredColorScheme(.dark)
 }

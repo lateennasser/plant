@@ -1,68 +1,98 @@
-//
-//  SettingPlant.swift
-//  plant
-//
-//  Created by Lateen Nasser on 30/05/1448 AH.
-//
-
 import SwiftUI
 
-struct MainPage: View {
-    @State private var plants: [String] = []
-    @State private var showOnboarding = false
-    @State private var showReminder = false
+struct SetReminderView: View {
+    @Environment(\.dismiss) private var dismiss
+    var viewModel: PlantViewModel
+
+    @State private var plant = Plant()
 
     var body: some View {
-        VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("My Plants 🌱")
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundStyle(.white)
+        NavigationStack {
+            Form {
+                Section {
+                    HStack {
+                        Text("Plant Name")
+                        TextField("Pothos", text: $plant.name)
+                            .tint(.gp)
+                    }
+                }
 
-                Rectangle()
-                    .fill(.white.opacity(0.2))
-                    .frame(height: 1)
+                Section {
+                    Picker(selection: $plant.room) {
+                        ForEach(Room.allCases, id: \.self) { room in
+                            Text(room.rawValue).tag(room)
+                        }
+                    } label: {
+                        rowLabel("Room", icon: "location")
+                    }
+                    .tint(.gray)
+
+                    Picker(selection: $plant.light) {
+                        ForEach(Light.allCases, id: \.self) { light in
+                            Text(light.rawValue).tag(light)                        }
+                    } label: {
+                        rowLabel("Light", icon: "sun.max")
+                    }
+                    .tint(.gray)
+                }
+
+                Section {
+                    Picker(selection: $plant.wateringDays) {
+                        ForEach(WateringDays.allCases, id: \.self) { day in
+                            Text(day.rawValue).tag(day)
+                        }
+                    } label: {
+                        rowLabel("Watering Days", icon: "drop")
+                    }
+                    .tint(.gray)
+
+                    Picker(selection: $plant.water) {
+                        ForEach(Water.allCases, id: \.self) { water in
+                            Text(water.rawValue).tag(water)
+                        }
+                    } label: {
+                        rowLabel("Water", icon: "drop")
+                    }
+                    .tint(.gray)
+                }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 16)
-
-            if plants.isEmpty {
-                Spacer()
-                Text("No reminders set yet..")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                Spacer()
-            } else {
-                List(plants, id: \.self) { plant in
-                    Text(plant)
+            .navigationTitle("Set Reminder")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        viewModel.addPlant(plant)
+                        dismiss()
+                    } label: {
+                        Image(systemName: "checkmark")
+                            .foregroundStyle(.white)
+                    }
+                    .buttonStyle(.glassProminent)
+                    .tint(.gp.opacity(0.45))
                 }
             }
         }
-        .overlay(alignment: .bottomTrailing) {
-            Button {
-                showReminder = true
-            } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: 17, weight: .medium))
-                    .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
-                    .glassEffect(.regular.tint(.gp.opacity(0.45)).interactive(), in: .circle)
-            }
-            .padding(24)
-        }
-        .onAppear {
-            showOnboarding = true
-        }
-        .fullScreenCover(isPresented: $showOnboarding) {
-            OnboardingView()
-        }
-        .sheet(isPresented: $showReminder) {
-            SetReminderView()
+    }
+
+    private func rowLabel(_ title: String, icon: String) -> some View {
+        Label {
+            Text(title)
+                .foregroundStyle(.white)
+        } icon: {
+            Image(systemName: icon)
+                .foregroundStyle(.white)
         }
     }
 }
 
 #Preview {
-    MainPage()
+    SetReminderView(viewModel: PlantViewModel())
         .preferredColorScheme(.dark)
 }
