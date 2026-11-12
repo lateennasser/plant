@@ -24,8 +24,9 @@ struct OnboardingView: View {
             }
 
             Button {
+                NotificationManager.shared.requestPermission()
                 showOnboarding = false
-                showReminder = true
+                showReminder = true      
             } label: {
                 Text("Set Plant Reminder")
                     .font(.system(size: 17, weight: .medium))

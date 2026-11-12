@@ -7,6 +7,7 @@ struct MainPage: View {
     @State private var showOnboarding = true
     @State private var showReminder = false
     @State private var plantToEdit: Plant?
+    @State private var showAllDone = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,9 +30,10 @@ struct MainPage: View {
                     .foregroundStyle(.secondary)
                     .opacity(showOnboarding || showReminder ? 0 : 1)
                 Spacer()
-            } else if viewModel.allWatered {
+            } else if showAllDone {
                 Spacer()
                 AllDoneView()
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
                 Spacer()
             } else {
                 VStack(spacing: 14) {
@@ -105,6 +107,22 @@ struct MainPage: View {
         }
         .onAppear {
             viewModel.setContext(modelContext)
+            showAllDone = viewModel.allWatered
+        }
+        .onChange(of: viewModel.allWatered) { _, isDone in
+            if isDone {
+                Task {
+                    try? await Task.sleep(for: .seconds(0.8))
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        showAllDone = viewModel.allWatered
+                    }
+                }
+            } else {
+                withAnimation {
+                    showAllDone = false
+                }
+            }
+        
         }
     }
 }

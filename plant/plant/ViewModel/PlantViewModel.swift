@@ -29,6 +29,7 @@ class PlantViewModel {
         guard !plant.name.isEmpty, let context else { return }
         context.insert(plant)
         try? context.save()
+        NotificationManager.shared.scheduleReminder(for: plant)   // ←
         plants.append(plant)
     }
 
@@ -45,9 +46,11 @@ class PlantViewModel {
         plant.wateringDays = draft.wateringDays
         plant.water = draft.water
         try? context?.save()
+        NotificationManager.shared.scheduleReminder(for: plant)   // ←
     }
 
     func deletePlant(_ plant: Plant) {
+        NotificationManager.shared.cancelReminder(for: plant)     // ←
         context?.delete(plant)
         try? context?.save()
         plants.removeAll { $0.id == plant.id }
