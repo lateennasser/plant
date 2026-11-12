@@ -1,8 +1,10 @@
 import SwiftUI
+import SwiftData
 
 struct SetReminderView: View {
     @Environment(\.dismiss) private var dismiss
     var viewModel: PlantViewModel
+    var plantToEdit: Plant? = nil
 
     @State private var plant = Plant()
 
@@ -29,7 +31,8 @@ struct SetReminderView: View {
 
                     Picker(selection: $plant.light) {
                         ForEach(Light.allCases, id: \.self) { light in
-                            Text(light.rawValue).tag(light)                        }
+                            Text(light.rawValue).tag(light)
+                        }
                     } label: {
                         rowLabel("Light", icon: "sun.max")
                     }
@@ -55,6 +58,18 @@ struct SetReminderView: View {
                     }
                     .tint(.gray)
                 }
+
+                if let plantToEdit {
+                    Section {
+                        Button(role: .destructive) {
+                            viewModel.deletePlant(plantToEdit)
+                            dismiss()
+                        } label: {
+                            Text("Delete Reminder")
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                }
             }
             .navigationTitle("Set Reminder")
             .navigationBarTitleDisplayMode(.inline)
@@ -68,7 +83,11 @@ struct SetReminderView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
-                        viewModel.addPlant(plant)
+                        if let plantToEdit {
+                            viewModel.updatePlant(plantToEdit, with: plant)
+                        } else {
+                            viewModel.addPlant(plant)
+                        }
                         dismiss()
                     } label: {
                         Image(systemName: "checkmark")
@@ -76,6 +95,15 @@ struct SetReminderView: View {
                     }
                     .buttonStyle(.glassProminent)
                     .tint(.gp.opacity(0.45))
+                }
+            }
+            .onAppear {
+                if let plantToEdit {
+                    plant = Plant(name: plantToEdit.name,
+                                  room: plantToEdit.room,
+                                  light: plantToEdit.light,
+                                  wateringDays: plantToEdit.wateringDays,
+                                  water: plantToEdit.water)
                 }
             }
         }
@@ -93,6 +121,9 @@ struct SetReminderView: View {
 }
 
 #Preview {
+    let container = try! ModelContainer(for: Plant.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     SetReminderView(viewModel: PlantViewModel())
         .preferredColorScheme(.dark)
+        .modelContainer(container)
 }

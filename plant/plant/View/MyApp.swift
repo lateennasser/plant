@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 @main
 struct MyApp: App {
@@ -7,5 +8,6 @@ struct MyApp: App {
             MainPage()
                 .preferredColorScheme(.dark)
         }
+        .modelContainer(for: Plant.self)
     }
 }

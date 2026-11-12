@@ -1,9 +1,12 @@
 import SwiftUI
+import SwiftData
 
 struct MainPage: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var viewModel = PlantViewModel()
     @State private var showOnboarding = true
     @State private var showReminder = false
+    @State private var plantToEdit: Plant?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,6 +28,10 @@ struct MainPage: View {
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(.secondary)
                     .opacity(showOnboarding || showReminder ? 0 : 1)
+                Spacer()
+            } else if viewModel.allWatered {
+                Spacer()
+                AllDoneView()
                 Spacer()
             } else {
                 VStack(spacing: 14) {
@@ -55,6 +62,17 @@ struct MainPage: View {
                         viewModel.toggleWatered(plant)
                     }
                     .listRowBackground(Color.clear)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        plantToEdit = plant
+                    }
+                    .swipeActions {
+                        Button(role: .destructive) {
+                            viewModel.deletePlant(plant)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
                 .listStyle(.plain)
             }
@@ -77,9 +95,16 @@ struct MainPage: View {
             if showOnboarding {
                 OnboardingView(showOnboarding: $showOnboarding, showReminder: $showReminder)
             }
+            
         }
         .sheet(isPresented: $showReminder) {
             SetReminderView(viewModel: viewModel)
+        }
+        .sheet(item: $plantToEdit) { plant in
+            SetReminderView(viewModel: viewModel, plantToEdit: plant)
+        }
+        .onAppear {
+            viewModel.setContext(modelContext)
         }
     }
 }
@@ -87,4 +112,5 @@ struct MainPage: View {
 #Preview {
     MainPage()
         .preferredColorScheme(.dark)
+        .modelContainer(for: Plant.self, inMemory: true)
 }
