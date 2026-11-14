@@ -1,10 +1,12 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 struct MainPage: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
+    @AppStorage("showOnboarding") private var showOnboarding = true
     @State private var viewModel = PlantViewModel()
-    @State private var showOnboarding = true
     @State private var showReminder = false
     @State private var plantToEdit: Plant?
     @State private var showAllDone = false
@@ -122,13 +124,20 @@ struct MainPage: View {
                     showAllDone = false
                 }
             }
-        
         }
-    }
-}
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active {
+                        viewModel.resetWateringIfNeeded()
+                    }
+                }
+                .onReceive(Timer.publish(every: 5, on: .main, in: .common).autoconnect()) { _ in
+                    viewModel.resetWateringIfNeeded()
+                }
+            }
+        }
 
-#Preview {
-    MainPage()
-        .preferredColorScheme(.dark)
-        .modelContainer(for: Plant.self, inMemory: true)
-}
+        #Preview {
+            MainPage()
+                .preferredColorScheme(.dark)
+                .modelContainer(for: Plant.self, inMemory: true)
+        }

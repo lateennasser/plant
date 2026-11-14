@@ -15,9 +15,8 @@ class NotificationManager {
         content.body = "\(plant.water.rawValue) in the \(plant.room.rawValue)"
         content.sound = .default
 
-        let seconds = Double(plant.wateringDays.days) * 24 * 60 * 60
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: seconds, repeats: true)
-
+     //   let seconds = Double(plant.wateringDays.days) * 24 * 60 * 60
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: false)
         let request = UNNotificationRequest(identifier: plant.notificationID,
                                             content: content,
                                             trigger: trigger)

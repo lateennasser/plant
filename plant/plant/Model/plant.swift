@@ -9,6 +9,7 @@ class Plant {
     var water: Water
     var isWatered: Bool
     var notificationID: String = UUID().uuidString
+    var lastWateredDate: Date? = nil
 
     init(name: String = "", room: Room = .bedroom, light: Light = .fullSun,
          wateringDays: WateringDays = .everyDay, water: Water = .small, isWatered: Bool = false) {
