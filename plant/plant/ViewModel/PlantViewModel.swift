@@ -21,26 +21,30 @@ class PlantViewModel {
         !plants.isEmpty && wateredCount == plants.count
     }
 
+    var sortedPlants: [Plant] {
+        plants.filter { !$0.isWatered } + plants.filter { $0.isWatered }
+    }
+
     func setContext(_ context: ModelContext) {
         self.context = context
         plants = (try? context.fetch(FetchDescriptor<Plant>())) ?? []
         resetWateringIfNeeded()
-        plants.forEach { NotificationManager.shared.scheduleReminder(for: $0) }
+        NotificationManager.shared.removeAllReminders()
+        updateDailyReminder()
     }
 
     func addPlant(_ plant: Plant) {
         guard !plant.name.isEmpty, let context else { return }
         context.insert(plant)
         try? context.save()
-        NotificationManager.shared.scheduleReminder(for: plant)
         plants.append(plant)
+        updateDailyReminder()
     }
 
     func toggleWatered(_ plant: Plant) {
         plant.isWatered.toggle()
         plant.lastWateredDate = plant.isWatered ? .now : nil
         try? context?.save()
-        NotificationManager.shared.scheduleReminder(for: plant)
     }
 
     func resetWateringIfNeeded() {
@@ -76,13 +80,21 @@ class PlantViewModel {
         plant.wateringDays = draft.wateringDays
         plant.water = draft.water
         try? context?.save()
-        NotificationManager.shared.scheduleReminder(for: plant)
     }
 
     func deletePlant(_ plant: Plant) {
-        NotificationManager.shared.cancelReminder(for: plant)
         context?.delete(plant)
         try? context?.save()
         plants.removeAll { $0.id == plant.id }
+        updateDailyReminder()
+    }
+
+    // إشعار واحد باليوم، ويتلغى لو ما فيه نباتات
+    private func updateDailyReminder() {
+        if plants.isEmpty {
+            NotificationManager.shared.cancelDailyReminder()
+        } else {
+            NotificationManager.shared.scheduleDailyReminder(testMode: testMode)
+        }
     }
 }

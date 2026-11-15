@@ -61,9 +61,12 @@ struct MainPage: View {
                 .padding(.top, 24)
                 .padding(.bottom, 16)
 
-                List(viewModel.plants) { plant in
+                List(viewModel.sortedPlants) { plant in
                     PlantRowView(plant: plant) {
-                        viewModel.toggleWatered(plant)
+                        withAnimation(.easeInOut) {
+                            viewModel.toggleWatered(plant)
+                        }
+                    
                     }
                     .listRowBackground(Color.clear)
                     .contentShape(Rectangle())
