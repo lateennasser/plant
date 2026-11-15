@@ -6,7 +6,7 @@ import SwiftData
 class PlantViewModel {
     var plants: [Plant] = []
     private var context: ModelContext?
-    private let testMode = true   // ← رجعيها false بعد التجربة
+    private let testMode = false   // ← رجعيها false بعد التجربة
 
     var progress: Double {
         guard !plants.isEmpty else { return 0 }
@@ -29,8 +29,12 @@ class PlantViewModel {
         self.context = context
         plants = (try? context.fetch(FetchDescriptor<Plant>())) ?? []
         resetWateringIfNeeded()
-        NotificationManager.shared.removeAllReminders()
-        updateDailyReminder()
+
+        // في التجربة ما نجدول عند الفتح، عشان الإشعار يجي بس بعد إضافة نبتة
+        if !testMode {
+            NotificationManager.shared.removeAllReminders()
+            updateDailyReminder()
+        }
     }
 
     func addPlant(_ plant: Plant) {
