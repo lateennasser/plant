@@ -95,6 +95,8 @@ struct SetReminderView: View {
                     }
                     .buttonStyle(.glassProminent)
                     .tint(.gp.opacity(0.45))
+                    .disabled(plant.name.trimmingCharacters(in: .whitespaces).isEmpty)
+
                 }
             }
             .onAppear {

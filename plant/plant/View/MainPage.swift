@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import Combine
 
 struct MainPage: View {
     @Environment(\.modelContext) private var modelContext
@@ -93,8 +92,7 @@ struct MainPage: View {
                         .font(.system(size: 17, weight: .medium))
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
-                        .glassEffect(.regular.tint(.gp.opacity(0.45)), in: .circle)
-                }
+                    .glassEffect(.regular.tint(.gp.opacity(0.45)).interactive(), in: .circle)                }
                 .padding(24)
             }
         }
@@ -133,9 +131,7 @@ struct MainPage: View {
                         viewModel.resetWateringIfNeeded()
                     }
                 }
-                .onReceive(Timer.publish(every: 5, on: .main, in: .common).autoconnect()) { _ in
-                    viewModel.resetWateringIfNeeded()
-                }
+              
             }
         }
 

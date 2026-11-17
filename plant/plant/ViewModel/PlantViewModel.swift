@@ -6,8 +6,7 @@ import SwiftData
 class PlantViewModel {
     var plants: [Plant] = []
     private var context: ModelContext?
-    private let testMode = false   // ← رجعيها false بعد التجربة
-
+    private let testMode = false
     var progress: Double {
         guard !plants.isEmpty else { return 0 }
         return Double(wateredCount) / Double(plants.count)
@@ -30,7 +29,6 @@ class PlantViewModel {
         plants = (try? context.fetch(FetchDescriptor<Plant>())) ?? []
         resetWateringIfNeeded()
 
-        // في التجربة ما نجدول عند الفتح، عشان الإشعار يجي بس بعد إضافة نبتة
         if !testMode {
             NotificationManager.shared.removeAllReminders()
             updateDailyReminder()
@@ -59,10 +57,8 @@ class PlantViewModel {
             var shouldReset = false
 
             if testMode {
-                // تجربة: بعد دقيقة
                 shouldReset = Date.now.timeIntervalSince(last) >= 60
             } else {
-                // الحقيقي: حسب أيام النبتة
                 let lastDay = calendar.startOfDay(for: last)
                 let today = calendar.startOfDay(for: .now)
                 let daysPassed = calendar.dateComponents([.day], from: lastDay, to: today).day ?? 0
@@ -93,7 +89,6 @@ class PlantViewModel {
         updateDailyReminder()
     }
 
-    // إشعار واحد باليوم، ويتلغى لو ما فيه نباتات
     private func updateDailyReminder() {
         if plants.isEmpty {
             NotificationManager.shared.cancelDailyReminder()

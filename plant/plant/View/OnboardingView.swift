@@ -32,8 +32,7 @@ struct OnboardingView: View {
                     .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(.white)
                     .frame(width: 280, height: 44)
-                    .glassEffect(.regular.tint(.gp.opacity(0.45)), in: .capsule)
-            }
+                .glassEffect(.regular.tint(.gp.opacity(0.45)).interactive(), in: .capsule)            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
